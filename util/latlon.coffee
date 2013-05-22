@@ -18,7 +18,7 @@ class LatLon
     c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     R * c
 
-  constructor: (@lat, @lon, @ele = 0, @radius = EARTH_RADIUS) ->
+  constructor: (@lat, @lon, @ele = 0, @radius) ->
     throw "Latitude cannot be undefined" unless @lat?
     throw "Longitude cannot be undefined" unless @lon?
 

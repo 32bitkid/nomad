@@ -32,7 +32,7 @@
       this.lat = lat;
       this.lon = lon;
       this.ele = ele != null ? ele : 0;
-      this.radius = radius != null ? radius : EARTH_RADIUS;
+      this.radius = radius;
       if (this.lat == null) {
         throw "Latitude cannot be undefined";
       }
