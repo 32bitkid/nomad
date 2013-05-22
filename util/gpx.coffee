@@ -1,6 +1,6 @@
 xpath = require 'xpath'
 
-processWaypoint = (wpt) ->
+processPoint = (wpt) ->
   {
     lat: parseFloat xpath.select("@lat",wpt)[0].value
     lon: parseFloat xpath.select("@lon",wpt)[0].value
@@ -13,7 +13,7 @@ class Gpx
     throw "An XML document is required" unless @dom?
 
   toJson: ->
-    processWaypoint(wpt) for wpt in xpath.select("//wpt", @dom)
+    processPoint(wpt) for wpt in xpath.select("//wpt|//trkpt", @dom)
 
 module.exports = (dom) ->
   new Gpx(dom)

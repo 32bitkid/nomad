@@ -2,7 +2,7 @@ expect = require("chai").expect
 
 dom = require('xmldom').DOMParser
 _ = require('underscore')
-gpx = require('../util/gpx')
+gpx = require('../util/gpx.coffee')
 
 describe "The GPX helper", ->
 
