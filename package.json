@@ -1,0 +1,15 @@
+{
+	"name": "nomad",
+	"version": "0.0.1",
+	"scripts": {
+		"test": "mocha"
+	},
+	"dependencies": {
+		"coffee-script": "*",
+		"mocha": "*",
+		"chai": "*",
+		"sinon": "*",
+		"restify": "*"
+	}
+
+}
