@@ -1,14 +1,9 @@
-var gpx = require('./util/gpx')
-var fs = require('fs')
-var xmlParser = require('xmldom').DOMParser
+var trail = require('./util/trail')
 
 var waypoints = []
-fs.readFile('./raw_data/ct_full.gpx', 'utf8', function (err, xml) {
-	var dom = new xmlParser().parseFromString(xml)
-	waypoints = gpx(dom).toJson()
-})
-
-
+trail.load({ path: './raw_data/ct_full.gpx'}).then(function(trail) {
+	waypoints = trail.path;
+});
 
 var server = require('restify').createServer()
 
