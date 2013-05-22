@@ -1,12 +1,14 @@
-var express = require("express");
-var app = express();
-app.use(express.logger());
+var restify = require('restify')
 
-app.get('/', function(request, response) {
-  response.send('Hello ambling rambler!');
-});
+function respond(request, response, next) {
+	response.send('Hello ' + request.params.name || 'ambling rambler!')
+}
+
+var server = restify.createServer()
+server.get('hello/:name', respond)
+server.head('hello/:name', respond)
 
 var port = process.env.PORT || 5000;
-app.listen(port, function() {
-  console.log("Listening on " + port);
-});
+server.listen(port, function() {
+  console.log("%s listening on %s", server.name, server.url)
+})
