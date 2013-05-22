@@ -1,11 +1,11 @@
-When = require("when")
+q = require("q")
 _ = require("underscore")
 fs = require('fs')
 xmlParser = require("xmldom").DOMParser
 gpx = require("./gpx")
 
 readFile = (fileName) ->
-  hasReadFile = When.defer()
+  hasReadFile = q.defer()
   fs.readFile fileName, 'utf8', (err, contents) ->
     return hasReadFile.reject(err) if err?
     return hasReadFile.resolve(contents)
@@ -18,10 +18,10 @@ class Trail
 defaultLoadOptions = {}
 
 parseIntoDom = (xml)-> new xmlParser().parseFromString(xml)
-gpxToJson = (dom) -> gpx(dom).toJson()
+convertToLineString = (dom) -> gpx(dom).toLineString()
 createTrail = (data) ->
   path = data[0]
-  new Trail(path)
+  trail = new Trail(path)
 
 module.exports.load = (options) ->
   options = _.extend({}, defaultLoadOptions, options)
@@ -29,7 +29,7 @@ module.exports.load = (options) ->
 
   path = readFile(options.path, 'utf8')
     .then(parseIntoDom)
-    .then(gpxToJson)
+    .then(convertToLineString)
+    .then((path) -> new Trail(path))
 
-  When.join(path).then(createTrail)
-
+  q.all([path])

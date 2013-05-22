@@ -1,8 +1,8 @@
 cp = require 'child_process'
-When = require("when")
+q = require("q")
 
 exec = (cmd) ->
-  hasExec = When.defer()
+  hasExec = q.defer()
   cp.exec cmd, (err, stdout, stderr) ->
     return hasExec.reject(err) if err?
     return hasExec.resolve(stdout + stderr)

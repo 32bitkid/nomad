@@ -8,9 +8,11 @@ describe "Loading a trail", ->
     expect(noPathGiven).to.throw("A trail \"path\" is required")
 
   it "should load from a path to xml", (done) ->
-    promise = Trail.load
-      path: "./raw_data/ct_full.gpx"
 
-    promise.then (trail) ->
+    expected = (trail) ->
+      expect(trail.path.coordinates.length).to.equal(1379)
       done()
+
+    promise = Trail.load(path: "./raw_data/ct_full.gpx")
+    promise.spread(expected).fail(done)
 
