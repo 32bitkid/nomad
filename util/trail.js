@@ -12,18 +12,7 @@
 
   gpx = require("./gpx");
 
-  readFile = function(fileName) {
-    var hasReadFile;
-
-    hasReadFile = q.defer();
-    fs.readFile(fileName, 'utf8', function(err, contents) {
-      if (err != null) {
-        return hasReadFile.reject(err);
-      }
-      return hasReadFile.resolve(contents);
-    });
-    return hasReadFile.promise;
-  };
+  readFile = q.nfbind(fs.readFile);
 
   Trail = (function() {
     function Trail(path) {

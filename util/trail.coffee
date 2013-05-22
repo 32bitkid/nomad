@@ -4,16 +4,10 @@ fs = require('fs')
 xmlParser = require("xmldom").DOMParser
 gpx = require("./gpx")
 
-readFile = (fileName) ->
-  hasReadFile = q.defer()
-  fs.readFile fileName, 'utf8', (err, contents) ->
-    return hasReadFile.reject(err) if err?
-    return hasReadFile.resolve(contents)
-  hasReadFile.promise
+readFile = q.nfbind(fs.readFile)
 
 class Trail
   constructor: (@path) ->
-
 
 defaultLoadOptions = {}
 
