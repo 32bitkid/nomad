@@ -2,7 +2,7 @@
 	"name": "nomad",
 	"version": "0.0.1",
 	"scripts": {
-		"test": "mocha"
+		"test": "mocha --compilers coffee:coffee-script"
 	},
 	"dependencies": {
 		"coffee-script": "*",
