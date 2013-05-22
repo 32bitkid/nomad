@@ -29,3 +29,19 @@ var port = process.env.PORT || 5000;
 server.listen(port, function() {
 	console.log("%s listening on %s", server.name, server.url)
 })
+
+
+
+var mongo = require('mongodb');
+
+var mongoUri = process.env.MONGOLAB_URI ||
+  process.env.MONGOHQ_URL ||
+  'mongodb://heroku_app15820215:em58r9ed9ha8r2hngghf4vnqeu@ds027348.mongolab.com:27348/heroku_app15820215';
+
+mongo.Db.connect(mongoUri, function (err, db) {
+	console.log(err)
+	db.collection('mydocs', function (er, collection) {
+		collection.insert({ 'mykey': 'myvalue' }, { safe: true }, function (er, rs) {
+		});
+	});
+});
