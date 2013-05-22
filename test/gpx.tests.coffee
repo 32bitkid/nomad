@@ -10,7 +10,7 @@ describe "The GPX helper", ->
     noDocument = -> gpx()
     expect(noDocument).to.throw("An XML document is required")
 
-  describe "processing a file", ->
+  describe "converting to a LineString", ->
 
     describe "with only 3 way points", ->
 
@@ -40,26 +40,29 @@ describe "The GPX helper", ->
 
       beforeEach ->
         gpxData = new dom().parseFromString(xml)
-        @results = gpx(gpxData).toJson()
+        @lineString = gpx(gpxData).toLineString()
 
       afterEach ->
-        delete @results
+        delete @lineString
+
+      it "it should be a LineString", ->
+        expect(@lineString.type).to.equal("LineString")
 
       it "get the correct length", ->
-        expect(@results.length).to.equal(3)
+        expect(@lineString.coordinates.length).to.equal(3)
 
-      it "should parse the correct longitude", ->
-        actual = _(@results).pluck("lon")
+      it "should have the correct longitude", ->
+        actual = _(@lineString.coordinates).pluck(1)
         expected = [-106.332433, -106.34085, -106.343467]
         expect(actual).to.deep.equal(expected)
 
       it "should parse the correct latitude", ->
-        actual = _(@results).pluck("lat")
+        actual = _(@lineString.coordinates).pluck(0)
         expected = [39.075217, 39.077567, 39.077167]
         expect(actual).to.deep.equal(expected)
 
       it "should parse the correct elevation", ->
-        actual = _(@results).pluck("ele")
+        actual = _(@lineString.coordinates).pluck(2)
         expected = [2809.3, 2808.8, 2809.6]
         expect(actual).to.deep.equal(expected)
 
@@ -96,25 +99,28 @@ describe "The GPX helper", ->
 
       beforeEach ->
         gpxData = new dom().parseFromString(xml)
-        @results = gpx(gpxData).toJson()
+        @lineString = gpx(gpxData).toLineString()
 
       afterEach ->
-        delete @results
+        delete @lineString
+
+      it "it should be a LineString", ->
+        expect(@lineString.type).to.equal("LineString")
 
       it "get the correct length", ->
-        expect(@results.length).to.equal(3)
+        expect(@lineString.coordinates.length).to.equal(3)
 
       it "should parse the correct longitude", ->
-        actual = _(@results).pluck("lon")
+        actual = _(@lineString.coordinates).pluck(1)
         expected = [-84.193897, -84.193870, -84.193864]
         expect(actual).to.deep.equal(expected)
 
       it "should parse the correct latitude", ->
-        actual = _(@results).pluck("lat")
+        actual = _(@lineString.coordinates).pluck(0)
         expected = [34.626686, 34.626703, 34.626750]
         expect(actual).to.deep.equal(expected)
 
       it "should parse the correct elevation", ->
-        actual = _(@results).pluck("ele")
+        actual = _(@lineString.coordinates).pluck(2)
         expected = [1147.759277, 1148.109985, 1147.943848]
         expect(actual).to.deep.equal(expected)
