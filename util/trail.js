@@ -15,8 +15,10 @@
   readFile = q.nfbind(fs.readFile);
 
   Trail = (function() {
-    function Trail(path) {
+    function Trail(options, path) {
       this.path = path;
+      this.name = options.name;
+      this.id = options.id;
     }
 
     return Trail;
@@ -33,10 +35,8 @@
     return gpx(dom).toLineString();
   };
 
-  createTrail = function(path) {
-    var trail;
-
-    return trail = new Trail(path);
+  createTrail = function(options, pathData) {
+    return new Trail(options, pathData);
   };
 
   module.exports.load = function(options) {
@@ -47,7 +47,7 @@
       throw "A trail \"path\" is required";
     }
     path = readFile(options.path, 'utf8').then(parseIntoDom).then(convertToLineString);
-    return q.all([path]).spread(createTrail);
+    return q.all([options, path]).spread(createTrail);
   };
 
 }).call(this);

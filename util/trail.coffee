@@ -7,14 +7,16 @@ gpx = require("./gpx")
 readFile = q.nfbind(fs.readFile)
 
 class Trail
-  constructor: (@path) ->
+  constructor: (options, @path) ->
+    @name = options.name
+    @id = options.id
 
 defaultLoadOptions = {}
 
 parseIntoDom = (xml)-> new xmlParser().parseFromString(xml)
 convertToLineString = (dom) -> gpx(dom).toLineString()
-createTrail = (path) ->
-  trail = new Trail(path)
+createTrail = (options, pathData) ->
+  new Trail(options, pathData)
 
 module.exports.load = (options) ->
   options = _.extend({}, defaultLoadOptions, options)
@@ -24,4 +26,4 @@ module.exports.load = (options) ->
     .then(parseIntoDom)
     .then(convertToLineString)
 
-  q.all([path]).spread(createTrail)
+  q.all([options, path]).spread(createTrail)
