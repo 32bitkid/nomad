@@ -18,9 +18,10 @@ class LatLon
     c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     R * c
 
-  constructor: (@lat, @lon, @ele = 0, @radius) ->
+  constructor: (@lat, @lon, @ele = 0, radius) ->
     throw "Latitude cannot be undefined" unless @lat?
     throw "Longitude cannot be undefined" unless @lon?
+    @radius = radius if radius?
 
   distanceTo: (other) ->
     distanceBetween(this, other, @radius)
