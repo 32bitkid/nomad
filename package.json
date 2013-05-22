@@ -10,7 +10,9 @@
 		"chai": "*",
 		"sinon": "*",
 		"restify": "*",
-		"express": "3.1.x"
+		"express": "3.1.x",
+		"xmldom": "*",
+		"xpath": "*"
 	},
 	"engines": {
 		"node": "0.10.x",
