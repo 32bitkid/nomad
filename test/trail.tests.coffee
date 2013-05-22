@@ -14,5 +14,5 @@ describe "Loading a trail", ->
       done()
 
     promise = Trail.load(path: "./raw_data/ct_full.gpx")
-    promise.spread(expected).fail(done)
+    promise.then(expected).fail(done)
 

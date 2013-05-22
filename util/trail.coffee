@@ -13,8 +13,7 @@ defaultLoadOptions = {}
 
 parseIntoDom = (xml)-> new xmlParser().parseFromString(xml)
 convertToLineString = (dom) -> gpx(dom).toLineString()
-createTrail = (data) ->
-  path = data[0]
+createTrail = (path) ->
   trail = new Trail(path)
 
 module.exports.load = (options) ->
@@ -24,6 +23,5 @@ module.exports.load = (options) ->
   path = readFile(options.path, 'utf8')
     .then(parseIntoDom)
     .then(convertToLineString)
-    .then((path) -> new Trail(path))
 
-  q.all([path])
+  q.all([path]).spread(createTrail)

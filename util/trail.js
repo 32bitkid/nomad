@@ -33,10 +33,9 @@
     return gpx(dom).toLineString();
   };
 
-  createTrail = function(data) {
-    var path, trail;
+  createTrail = function(path) {
+    var trail;
 
-    path = data[0];
     return trail = new Trail(path);
   };
 
@@ -47,10 +46,8 @@
     if (options.path == null) {
       throw "A trail \"path\" is required";
     }
-    path = readFile(options.path, 'utf8').then(parseIntoDom).then(convertToLineString).then(function(path) {
-      return new Trail(path);
-    });
-    return q.all([path]);
+    path = readFile(options.path, 'utf8').then(parseIntoDom).then(convertToLineString);
+    return q.all([path]).spread(createTrail);
   };
 
 }).call(this);
