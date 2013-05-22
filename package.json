@@ -12,7 +12,8 @@
 		"restify": "*",
 		"express": "3.1.x",
 		"xmldom": "*",
-		"xpath": "*"
+		"xpath": "*",
+		"underscore": "*"
 	},
 	"engines": {
 		"node": "0.10.x",
