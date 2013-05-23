@@ -112,6 +112,80 @@
 			}
 		})
 
+		VisualizationView = Backbone.View.extend({
+			initialize: function() {
+				this.listenTo(this.collection, "request", this.clearStats)
+				this.listenTo(this.collection, "sync", this.updateStats)
+				this.canvas = this.$("#elevation canvas").get(0)
+			},
+			clearStats: function() {
+				this.$("#start h3, #end h3").text("...")
+
+				this.canvas.width = this.canvas.width
+
+			},
+			updateStats: function() {
+				startKM = this.collection.first().get("distanceFromStart")
+				endKM = this.collection.last().get("distanceFromStart")
+
+				elevations = this.collection.pluck("elevation")
+				minElevation = _.min(elevations)
+				maxElevation = _.max(elevations)
+
+				this.$("#start h3").text(startKM.toFixed(0))
+				this.$("#end h3").text(endKM.toFixed(0))
+
+				var width = this.canvas.width;
+				var height = this.canvas.height;
+
+				var ctx = this.canvas.getContext("2d")
+				ctx.save()
+
+				ctx.beginPath()
+				ctx.moveTo(0,height)
+				ctx.fillStyle = "#3498db"
+
+
+				var eleToY = function(ele) {
+					var elePercent = (ele - minElevation) / (maxElevation - minElevation)
+					return  (height/2) - (elePercent - 0.5) * 75
+				}
+
+				var drawGuide = function(ctx, y) {
+					ctx.beginPath()
+					ctx.moveTo(0,y)
+					ctx.lineTo(width,y)
+					ctx.stroke()
+
+				}
+
+				this.collection.each(function(p) {
+					var x = (p.get("distanceFromStart") - startKM) / (endKM - startKM) * width
+					var y = eleToY(p.get("elevation"))
+					ctx.lineTo(x,y)
+				})
+
+				ctx.lineTo(width,height)
+				ctx.fill()
+
+				ctx.save()
+				ctx.lineWidth = 2
+				ctx.globalAlpha = 0.25
+
+				ctx.strokeStyle = "#2980b9"
+				drawGuide(ctx, height/2)
+
+				ctx.strokeStyle = "#f1c40f"
+				drawGuide(ctx, eleToY(maxElevation))
+
+				ctx.strokeStyle = "#c0392b"
+				drawGuide(ctx, eleToY(minElevation))
+				ctx.restore()
+
+				ctx.restore()
+			}
+		})
+
 		$(function () {
 			var trails = new Trails();
 			var points = window.points = new Backbone.Collection();
@@ -119,6 +193,7 @@
 			var nameView = new NameView({collection: trails, el:document.getElementById("name")}).render();
 			var descriptionView = new DescriptionView({collection: trails, el:document.getElementById("description")}).render()
 			var mapView = new MapView({collection:points, el:document.getElementById("map")}).render()
+			var vizView = new VisualizationView({collection:points, el:document.getElementById("visualization")}).render()
 
 			trails.fetch().done(function() {
 				var firstTrail = trails.first()
@@ -134,15 +209,36 @@
 			width: 100%;
 			line-height: 60px;
 		}
+		#visualization {
+			height: 200px;
+			width: 100%;
+			display: table;
+		}
+
+		#elevation, #start, #end { display: table-cell; }
+
+		#elevation {		}
+
+		#graph {
+			width: 100%; height: 200px;
+		}
+
+		#start, #end {
+			width: 7em;
+			background-color: #ccc;
+			text-align: center;
+			vertical-align: middle;
+		}
+
 	</style>
 </head>
 <body>
 	<h1 id="name"></h1>
 	<div id="description"></div>
 	<div id="visualization">
-		<div id="start"></div>
-		<div id="elevation"></div>
-		<div id="end"></div>
+		<div id="start"><h3>...</h3></div>
+		<div id="elevation"><canvas id="graph" width="800" height="200"></canvas></div>
+		<div id="end"><h3>...</h3></div>
 	</div>
 	<div id="map">
 		<div id="loading" class="icon-spinner icon-spin icon-4x"></div>
