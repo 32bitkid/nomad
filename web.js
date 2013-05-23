@@ -7,13 +7,6 @@ trail.load({ path: './raw_data/ct_full.gpx'}).then(function(trail) {
 
 var server = require('restify').createServer()
 
-function respond(request, response, next) {
-	response.send('Hello ' + (request.params.name || 'ambling rambler!'))
-}
-server.get('hello', respond)
-server.get('hello/:name', respond)
-
-
 server.get('waypoint/:index', waypoint)
 function waypoint(request, response, next) {
 	response.send(waypoints[request.params.index])
