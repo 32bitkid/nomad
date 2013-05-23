@@ -4,8 +4,10 @@
 <head>
 	<meta charset="utf-8" />
 	<title></title>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-	<script src="http://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+	<link rel=stylesheet href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css">
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css" rel="stylesheet">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+	<script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 	<script>
 		$(function () {
 			$.get("trails", onTrails, 'json')
@@ -15,6 +17,7 @@
 				$('#name').text(trail.name)
 				$('#description').text(trail.description)
 
+				$('#map-canvas').html("<i class='icon-spinner icon-spin icon-4x'></i>")
 				$.get(trail.points.href, onPoints, 'json')
 			}
 
@@ -59,6 +62,8 @@
 	<style>
 		#map-canvas {
 			height: 650px;
+			width: 100%;
+			line-height: 60px;
 		}
 	</style>
 </head>
