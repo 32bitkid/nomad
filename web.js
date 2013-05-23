@@ -17,10 +17,11 @@ function waypoint(request, response, next) {
 server.get('trails', getTrails)
 
 function getTrails(request, response, next) {
+	var base = baseUrl(request)
 	db('trails', function (collection) {
 		collection.find().toArray(function(err, results) {
 			if (err) console.log(err)
-			else response.send(_.map(results, augmentTrail))
+			else response.send(_.map(results, function (trail) { return augmentTrail(trail, base) }))
 		})
 	})
 	return next()
@@ -29,19 +30,27 @@ function getTrails(request, response, next) {
 server.get('trails/:trailId', getTrail)
 
 function getTrail(request, response, next) {
+	var base = baseUrl(request)
 	var key = new MongoID(request.params.trailId)
 	db('trails', function (collection) {
 		collection.find(key).toArray(function (err, result) {
 			if (err) console.log(err)
-			else response.send(augmentTrail(result[0]))
+			else response.send(augmentTrail(result[0], base))
 		})
 	})
 	return next()
 }
 
-function augmentTrail(trail) {
-	trail.href = '/trails/' + trail._id
+function augmentTrail(trail, base) {
+	trail.href = base + '/trails/' + trail._id
 	return trail
+}
+
+function baseUrl(request) {
+	if (!request) return ''
+	var protocol = request.header('X-Forwarded-Proto') || 'http'
+	var host = request.header('Host')
+	return protocol + '://' + host
 }
 
 
