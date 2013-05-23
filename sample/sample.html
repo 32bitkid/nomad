@@ -46,6 +46,7 @@
 			initialize: function() {
 				//this.listenTo(this.collection, "all", function() { console.log(arguments); })
 				this.listenTo(this.collection, "request", this.scrim)
+				this.listenTo(this.collection, "sync", this.showLength)
 				this.listenTo(this.collection, "sync", this.drawPath)
 
 				var options = {
@@ -54,7 +55,6 @@
 				}
 
 				this.map = new google.maps.Map(this.$("#map-canvas").get(0), options)
-
 			},
 			render: function() {
 				return this;
@@ -95,6 +95,11 @@
 					polyline.path.push(new google.maps.LatLng(point.lat, point.long))
 				})
 				new google.maps.Polyline(polyline).setMap(this.map)
+			},
+			showLength: function () {
+				var first = points[0], last = points[points.length - 1]
+				var text = 'Total length shown: ' + (last.distanceFromStart - first.distanceFromStart) + ' kilometers')
+				this.$('#totalLength').text(text)
 			}
 		})
 
@@ -132,6 +137,7 @@
 	</div>
 	<div id="map">
 		<div id="loading" class="icon-spinner icon-spin icon-4x"></div>
+		<h3 id=totalLength></h3>
 		<div id="map-canvas"></div>
 	</div>
 </body>
