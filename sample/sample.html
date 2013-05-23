@@ -105,9 +105,9 @@
 				this.currentPolyline.setMap(this.map)
 			},
 			showLength: function () {
-				var points = this.collection.toJSON();
-				var first = points[0], last = points[points.length - 1]
-				var text = 'Total length shown: ' + (last.distanceFromStart - first.distanceFromStart) + ' kilometers'
+				var first = this.collection.first().get("distanceFromStart"),
+					last = this.collection.last().get("distanceFromStart")
+				var text = 'Total length shown: ' + (last - first).toFixed(2) + ' kilometers'
 				this.$('#totalLength').text(text)
 			}
 		})
