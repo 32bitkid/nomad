@@ -60,6 +60,7 @@ function getTrailPoints(request, response, next) {
 		collection
 			.find({ trail: trailId }, { exhaust: true })
 			.sort('distanceFromStart')
+			.batchSize(5000)
 			.toArray(function (err, results) {
 				if (err) console.log(err)
 				else response.send(_.map(results, function (point) { return convertPoint(point, base) }))
@@ -70,11 +71,11 @@ function getTrailPoints(request, response, next) {
 
 function convertPoint(point, base) {
 	return {
-		distanceFromStart: point.distancefromStart,
+		distanceFromStart: point.distanceFromStart,
 		distanceFromPrevious: point.distanceFromPrevious,
 		lat: point.loc.coordinates[0],
 		long: point.loc.coordinates[1],
-		elevation: point.loc.coordinates[3],
+		elevation: point.loc.coordinates[2],
 		trail: { href: base + '/trails/' + point.trail }
 	}
 }
