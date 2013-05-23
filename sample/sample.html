@@ -8,27 +8,31 @@
 	<script src="http://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 	<script>
 		$(function () {
-			$.get("http://nomad-api.herokuapp.com/trails", onTrails, 'json')
+			$.get("trails", onTrails, 'json')
 
 			function onTrails(trails, status) {
 				var trail = trails[0]
 				$('#name').text(trail.name)
 				$('#description').text(trail.description)
 
-				var first = trail.path.coordinates[0], last = trail.path.coordinates[trail.path.coordinates.length-1]
+				$.get(trail.points.href, onPoints, 'json')
+			}
+
+			function onPoints(points, status) {
+				var first = points[0], last = points[points.length - 1]
 				var bounds = new google.maps.LatLngBounds(
 					new google.maps.LatLng(
-						Math.min(first[0], last[0]),
-						Math.min(first[1], last[1])
+						Math.min(first.lat, last.lat),
+						Math.min(first.long, last.long)
 					),
 					new google.maps.LatLng(
-						Math.max(first[0], last[0]),
-						Math.max(first[1], last[1])
+						Math.max(first.lat, last.lat),
+						Math.max(first.long, last.long)
 					)
 				)
 				var center = new google.maps.LatLng(
-					0.5 * (first[0] + last[0]),
-					0.5 * (first[1] + last[1])
+					0.5 * (first.lat + last.lat),
+					0.5 * (first.long + last.long)
 				)
 				var options = {
 					zoom: 4,
@@ -45,8 +49,8 @@
 					strokeOpacity: 1.0,
 					strokeWeight: 2
 				}
-				$.each(trail.path.coordinates, function (index, coord) {
-					polyline.path.push(new google.maps.LatLng(coord[0], coord[1]))
+				$.each(points, function (index, point) {
+					polyline.path.push(new google.maps.LatLng(point.lat, point.long))
 				})
 				new google.maps.Polyline(polyline).setMap(map)
 			}
