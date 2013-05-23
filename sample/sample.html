@@ -8,20 +8,51 @@
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css" rel="stylesheet">
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 	<script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+	<script src="http://underscorejs.org/underscore-min.js"></script>
+	<script src="http://backbonejs.org/backbone-min.js"></script>
 	<script>
-		$(function () {
-			$.get("trails", onTrails, 'json')
+		Points = Backbone.Collection.extend({});
 
-			function onTrails(trails, status) {
-				var trail = trails[0]
-				$('#name').text(trail.name)
-				$('#description').text(trail.description)
-
-				$('#map-canvas').html("<i class='icon-spinner icon-spin icon-4x'></i>")
-				$.get(trail.points.href, onPoints, 'json')
+		Trails = Backbone.Collection.extend({
+			url: "trails",
+			createPointsCollection: function() {
+				return Points.extend({
+					url: this.get("points").href
+				})
 			}
+		});
 
-			function onPoints(points, status) {
+		NameView = Backbone.View.extend({
+			initialize: function() {
+				this.listenTo(this.collection, "activate", this.onActivate)
+			},
+			onActivate: function(trail) {
+				this.$el.text(trail.get("name"))
+				return this;
+			}
+		})
+
+		DescriptionView = Backbone.View.extend({
+			initialize: function() {
+				this.listenTo(this.collection, "activate", this.onActivate)
+			},
+			onActivate: function(trail) {
+				this.$el.text(trail.get("description"))
+				return this;
+			}
+		});
+
+		MapView = Backbone.View.extend({
+			initialize: function() {
+				//this.listenTo(this.collection, "all", function() { console.log(arguments); })
+				this.listenTo(this.collection, "request", this.scrim)
+				this.listenTo(this.collection, "sync", this.createMap)
+			},
+			scrim: function() {
+				this.$el.html("<i class='icon-spinner icon-spin icon-4x'></i>")
+			},
+			createMap: function() {
+				var points = this.collection.toJSON();
 				var first = points[0], last = points[points.length - 1]
 				var bounds = new google.maps.LatLngBounds(
 					new google.maps.LatLng(
@@ -58,6 +89,22 @@
 				new google.maps.Polyline(polyline).setMap(map)
 			}
 		})
+
+		$(function () {
+			var trails = new Trails();
+			var points = new Backbone.Collection();
+
+			var nameView = new NameView({collection: trails, el:document.getElementById("name")});
+			var descriptionView = new DescriptionView({collection: trails, el:document.getElementById("description")})
+			var mapView = new MapView({collection:points, el:document.getElementById("map-canvas")})
+
+			trails.fetch().done(function() {
+				var firstTrail = trails.first()
+				firstTrail = firstTrail.trigger("activate", firstTrail)
+				points.url = firstTrail.get("points").href
+				points.fetch()
+			})
+		})
 	</script>
 	<style>
 		#map-canvas {
@@ -68,8 +115,13 @@
 	</style>
 </head>
 <body>
-	<h1 id=name></h1>
-	<div id=description></div>
+	<h1 id="name"></h1>
+	<div id="description"></div>
+	<div id="visualization">
+		<div id="start"></div>
+		<div id="elevation"></div>
+		<div id="end"></div>
+	</div>
 	<div id="map-canvas"></div>
 </body>
 </html>
