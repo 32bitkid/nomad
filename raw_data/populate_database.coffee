@@ -23,11 +23,12 @@ mongo.Db.connect mongoUri, {safe: true}, (err, db) ->
     collection.remove (err) ->
       gpx.fromFile("./raw_data/CTR2013.gpx").done (gpx) ->
         results = gpx.toPointArray(trails.CT._id)
-        q.ninvoke(collection, "insert", results).done( -> pointsDone.resolve())
+        collection.insert(results, {safe: true}, (e) -> return pointsDone.reject(e) if e?; pointsDone.resolve())
 
   db.collection 'trails2', (er, collection) ->
     collection.remove ->
-      q.ninvoke(collection, "insert", (val for key, val of trails)).done( -> trailsDone.resolve())
+      results = (val for key, val of trails)
+      collection.insert(results, {safe:true}, (e) -> return pointsDone.reject(e) if e?; trailsDone.resolve())
 
   q.all([pointsDone.promise, trailsDone.promise]).done( -> console.log("done"); db.close() )
 
