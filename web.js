@@ -33,10 +33,21 @@ var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
   'mongodb://heroku_app15820215:em58r9ed9ha8r2hngghf4vnqeu@ds027348.mongolab.com:27348/heroku_app15820215';
 
+
+/*
 mongo.Db.connect(mongoUri, function (err, db) {
 	console.log(err)
-	db.collection('mydocs', function (er, collection) {
-		collection.insert({ 'mykey': 'myvalue' }, { safe: true }, function (er, rs) {
-		});
-	});
-});
+	db.collection('trails', function (er, collection) {
+		collection.insert({
+			name: 'Colorado Trail',
+			description: 'Colorado’s premier long distance trail, stretching almost 500 miles from Denver to Durango.',
+			homepage: 'http://www.coloradotrail.org/'
+		}, { safe: true }, function (er, rs) { })
+		collection.insert({
+			name: 'Appalachian Trail',
+			description: '2,200 miles (3,500 km) through Georgia, North Carolina, Tennessee, Virginia, West Virginia, Maryland, Pennsylvania, New Jersey, New York, Connecticut, Massachusetts, Vermont, New Hampshire, and Maine.',
+			homepage: 'http://www.nps.gov/appa'
+		}, { safe: true }, function (er, rs) { })
+	})
+})
+*/
