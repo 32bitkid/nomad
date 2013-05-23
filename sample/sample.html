@@ -11,7 +11,39 @@
 	<script src="http://underscorejs.org/underscore-min.js"></script>
 	<script src="http://backbonejs.org/backbone-min.js"></script>
 	<script>
-		Points = Backbone.Collection.extend({});
+		Points = Backbone.Collection.extend({
+
+			distanceAtStart: function() {
+				return this.length > 0 ? this.first().get("distanceFromStart") : undefined;
+			},
+			distanceAtEnd : function() {
+				return this.length > 0 ? this.last().get("distanceFromStart") : undefined;
+			},
+			totalDistance: function() {
+				return this.length > 0 ? Math.abs(this.distanceAtEnd() - this.distanceAtStart()) : undefined;
+			},
+			elevationStats: function() {
+				var elevations = this.pluck("elevation")
+
+				var totalClimb = 0, totalDescent = 0, lowest = Number.POSITIVE_INFINITY, highest = Number.NEGATIVE_INFINITY;
+				var lastElevation = _.first(elevations)
+				_.each(elevations, function(e) {
+					if(e < lowest) lowest = e;
+					if(e > highest) highest = e;
+					if(e > lastElevation) totalClimb += e - lastElevation;
+					if(e < lastElevation) totalDescent += lastElevation - e;
+
+					lastElevation = e
+				})
+
+				return {
+					highestPoint: highest,
+					lowestPoint: lowest,
+					totalClimb: totalClimb,
+					totalDescent: totalDescent
+				}
+			}
+		});
 
 		Trails = Backbone.Collection.extend({
 			url: "trails",
@@ -46,9 +78,10 @@
 			initialize: function() {
 				//this.listenTo(this.collection, "all", function() { console.log(arguments); })
 				this.listenTo(this.collection, "request", this.scrim)
-				this.listenTo(this.collection, "sync", this.showLength)
+				this.listenTo(this.collection, "sync", this.updateStats)
 				this.listenTo(this.collection, "sync", this.drawPath)
 				this.listenTo(this.collection, "request", this.clearMap)
+				this.listenTo(this.collection, "request", this.clearStats)
 
 				var options = {
 					zoom: 4,
@@ -106,16 +139,26 @@
 				this.currentPolyline = new google.maps.Polyline(polyline)
 				this.currentPolyline.setMap(this.map)
 			},
-			showLength: function () {
+
+			clearStats: function() {
+				this.$('#stats').hide()
+			},
+
+			updateStats: function () {
 				if(this.collection.length == 0) {
-					this.$('#totalLength').text("")
-					return;
+					return this.clearStats();
 				}
 
-				var first = this.collection.first().get("distanceFromStart"),
-					last = this.collection.last().get("distanceFromStart")
-				var text = 'Total length shown: ' + (last - first).toFixed(2) + ' kilometers'
+				this.$("#stats").show()
+
+				var text = this.collection.totalDistance().toFixed(2) + ' kilometers'
 				this.$('#totalLength').text(text)
+
+				var stats = this.collection.elevationStats()
+				this.$('#highestPoint').text(stats.highestPoint.toFixed(2) + " meters")
+				this.$('#lowestPoint').text(stats.lowestPoint.toFixed(2) + " meters")
+				this.$('#totalClimb').text(stats.totalClimb.toFixed(0) + " meters")
+				this.$('#totalDescent').text(stats.totalDescent.toFixed(0) + " meters")
 			}
 		})
 
@@ -134,8 +177,9 @@
 			updateStats: function() {
 				if(this.collection.length == 0) return;
 
-				startKM = this.collection.first().get("distanceFromStart")
-				endKM = this.collection.last().get("distanceFromStart")
+				startKM = this.collection.distanceAtStart()
+				endKM = this.collection.distanceAtEnd()
+				totalKM = this.collection.totalDistance()
 
 				elevations = this.collection.pluck("elevation")
 				minElevation = _.min(elevations)
@@ -169,7 +213,7 @@
 				}
 
 				this.collection.each(function(p) {
-					var x = (p.get("distanceFromStart") - startKM) / (endKM - startKM) * width
+					var x = (p.get("distanceFromStart") - startKM) / totalKM * width
 					var y = eleToY(p.get("elevation"))
 					ctx.lineTo(x,y)
 				})
@@ -197,7 +241,7 @@
 
 		$(function () {
 			var trails = new Trails();
-			var points = window.points = new Backbone.Collection();
+			var points = window.points = new Points();
 
 			var nameView = new NameView({collection: trails, el:document.getElementById("name")}).render();
 			var descriptionView = new DescriptionView({collection: trails, el:document.getElementById("description")}).render()
@@ -239,6 +283,9 @@
 			vertical-align: middle;
 		}
 
+		#start { background-color: #2ecc71; }
+		#end { background-color: #e74c3c;}
+
 	</style>
 </head>
 <body>
@@ -251,7 +298,13 @@
 	</div>
 	<div id="map">
 		<div id="loading" class="icon-spinner icon-spin icon-4x"></div>
-		<h3 id=totalLength></h3>
+		<dl id="stats">
+			<dt>Total length shown:</dt><dd id="totalLength"></dd>
+			<dt>Highest Elevation:</dt><dd id="highestPoint"></dd>
+			<dt>Lowest Elevation:</dt><dd id="lowestPoint"></dd>
+			<dt>Total Climb:</dt><dd id="totalClimb"></dd>
+			<dt>Total Descent:</dt><dd id="totalDescent"></dd>
+		</dl>
 		<div id="map-canvas"></div>
 	</div>
 </body>
