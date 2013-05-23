@@ -46,12 +46,26 @@
 			initialize: function() {
 				//this.listenTo(this.collection, "all", function() { console.log(arguments); })
 				this.listenTo(this.collection, "request", this.scrim)
-				this.listenTo(this.collection, "sync", this.createMap)
+				this.listenTo(this.collection, "sync", this.drawPath)
+
+				var options = {
+					zoom: 4,
+					mapTypeId: google.maps.MapTypeId.TERRAIN
+				}
+
+				this.map = new google.maps.Map(this.$("#map-canvas").get(0), options)
+
+			},
+			render: function() {
+				return this;
 			},
 			scrim: function() {
-				this.$el.html("<i class='icon-spinner icon-spin icon-4x'></i>")
+				this.$("#loading").show()
 			},
-			createMap: function() {
+			drawPath: function() {
+				this.$("#loading").hide()
+
+				this.$el.removeClass("icon-spinner icon-4x")
 				var points = this.collection.toJSON();
 				var first = points[0], last = points[points.length - 1]
 				var bounds = new google.maps.LatLngBounds(
@@ -68,14 +82,8 @@
 					0.5 * (first.lat + last.lat),
 					0.5 * (first.long + last.long)
 				)
-				var options = {
-					zoom: 4,
-					center: center,
-					mapTypeId: google.maps.MapTypeId.TERRAIN
-				}
-				var canvas = $('#map-canvas')
-				var map = new google.maps.Map(canvas.get(0), options)
-				map.fitBounds(bounds)
+
+				this.map.fitBounds(bounds)
 
 				var polyline = {
 					path: [],
@@ -86,17 +94,17 @@
 				$.each(points, function (index, point) {
 					polyline.path.push(new google.maps.LatLng(point.lat, point.long))
 				})
-				new google.maps.Polyline(polyline).setMap(map)
+				new google.maps.Polyline(polyline).setMap(this.map)
 			}
 		})
 
 		$(function () {
 			var trails = new Trails();
-			var points = new Backbone.Collection();
+			var points = window.points = new Backbone.Collection();
 
-			var nameView = new NameView({collection: trails, el:document.getElementById("name")});
-			var descriptionView = new DescriptionView({collection: trails, el:document.getElementById("description")})
-			var mapView = new MapView({collection:points, el:document.getElementById("map-canvas")})
+			var nameView = new NameView({collection: trails, el:document.getElementById("name")}).render();
+			var descriptionView = new DescriptionView({collection: trails, el:document.getElementById("description")}).render()
+			var mapView = new MapView({collection:points, el:document.getElementById("map")}).render()
 
 			trails.fetch().done(function() {
 				var firstTrail = trails.first()
@@ -122,6 +130,9 @@
 		<div id="elevation"></div>
 		<div id="end"></div>
 	</div>
-	<div id="map-canvas"></div>
+	<div id="map">
+		<div id="loading" class="icon-spinner icon-spin icon-4x"></div>
+		<div id="map-canvas"></div>
+	</div>
 </body>
 </html>
