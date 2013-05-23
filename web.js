@@ -60,7 +60,6 @@ function getTrailPoints(request, response, next) {
 		collection
 			.find({ trail: trailId }, { exhaust: true })
 			.sort('distanceFromStart')
-			.batchSize(5000)
 			.toArray(function (err, results) {
 				if (err) console.log(err)
 				else response.send(_.map(results, function (point) { return convertPoint(point, base) }))
