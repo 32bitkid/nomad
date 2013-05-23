@@ -58,7 +58,7 @@ function getTrailPoints(request, response, next) {
 	var trailId = new MongoID(request.params.trailId)
 	db('points', function (collection) {
 		collection
-			.find({ trail: trailId }, { exhaust: true })
+			.find({ trail: trailId, distanceFromPrevious:{$gte: 0.1} }, { exhaust: true })
 			.sort('distanceFromStart')
 			.toArray(function (err, results) {
 				if (err) console.log(err)
