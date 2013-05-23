@@ -17,7 +17,23 @@ server.get('hello/:name', respond)
 server.get('waypoint/:index', waypoint)
 function waypoint(request, response, next) {
 	response.send(waypoints[request.params.index])
+	return next()
 }
+
+server.get('trails', getTrails)
+server.get('trails/:trailId', getTrail)
+
+function getTrails(request, response, next) {
+	response.send("Under Construction!")
+	return next()
+}
+
+function getTrail(request, response, next) {
+	response.send("Under Construction!")
+	return next()
+}
+
+
 
 
 var port = process.env.PORT || 5000;
