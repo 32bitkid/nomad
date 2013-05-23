@@ -6,7 +6,8 @@ trail.load({ path: './raw_data/ct_full.gpx'}).then(function(trail) {
 	waypoints = trail.path;
 });
 
-var server = require('restify').createServer()
+var restify = require('restify')
+var server = restify.createServer()
 server.use(
 	function crossOrigin(req, res, next) {
 		res.header("Access-Control-Allow-Origin", "*");
@@ -14,7 +15,6 @@ server.use(
 		return next();
 	}
 )
-
 server.get('waypoint/:index', waypoint)
 function waypoint(request, response, next) {
 	response.send(waypoints[request.params.index])
@@ -59,6 +59,8 @@ function baseUrl(request) {
 }
 
 
+
+//server.get('/:file', restify.serveStatic({ directory: '', match: /.*\.html/ }))
 
 
 var port = process.env.PORT || 5000;
