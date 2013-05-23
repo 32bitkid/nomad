@@ -24,7 +24,7 @@ function waypoint(request, response, next) {
 server.get('trails', getTrails)
 function getTrails(request, response, next) {
 	var base = baseUrl(request)
-	db('trails', function (collection) {
+	db('trails2', function (collection) {
 		collection.find().toArray(function(err, results) {
 			if (err) console.log(err)
 			else response.send(_.map(results, function (trail) { return augmentTrail(trail, base) }))
@@ -37,7 +37,7 @@ server.get('trails/:trailId', getTrail)
 function getTrail(request, response, next) {
 	var base = baseUrl(request)
 	var key = new MongoID(request.params.trailId)
-	db('trails', function (collection) {
+	db('trails2', function (collection) {
 		collection.find(key).toArray(function (err, results) {
 			if (err) console.log(err)
 			else response.send(augmentTrail(results[0], base))
@@ -48,8 +48,25 @@ function getTrail(request, response, next) {
 
 function augmentTrail(trail, base) {
 	trail.href = base + '/trails/' + trail._id
+	trail.points = { href: base + '/points/' + trail._id }
 	return trail
 }
+
+server.get("points/:trailId", getTrailPoints)
+function getTrailPoints(request, response, next) {
+	var trailId = new MongoID(request.params.trailId)
+	db('points', function (collection) {
+		collection
+			.find({ trail: trailId }, { exhaust: true })
+			.sort('distanceFromStart')
+			.toArray(function (err, results) {
+				if (err) console.log(err)
+				else response.send(results)
+			})
+	})
+	return next()
+}
+
 
 function baseUrl(request) {
 	if (!request) return ''

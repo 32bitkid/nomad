@@ -7,6 +7,7 @@ trails =
     name: 'Colorado Trail'
     description: 'Colorado\'s premier long distance trail, stretching almost 500 miles from Denver to Durango.'
     homepage: 'http://www.coloradotrail.org/'
+    rawData: "./raw_data/CTR2013.gpx"
 
 points = []
 
@@ -24,7 +25,7 @@ mongo.Db.connect mongoUri, {safe: true}, (err, db) ->
         results = gpx.toPointArray(trails.CT._id)
         q.ninvoke(collection, "insert", results).done( -> pointsDone.resolve())
 
-  db.collection 'trails', (er, collection) ->
+  db.collection 'trails2', (er, collection) ->
     collection.remove ->
       q.ninvoke(collection, "insert", (val for key, val of trails)).done( -> trailsDone.resolve())
 
