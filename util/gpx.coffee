@@ -24,6 +24,27 @@ addDistanceFromStart = (coords) ->
     currentPoint.push(accumulator)
     previousPoint = currentPoint
 
+processRawToPointArray = (trail, coords) ->
+  previousPoint = coords[0]
+
+  accumulator = 0
+
+  for currentPoint, index in coords
+    distanceToPrevious = latlon.distanceBetween(previousPoint, currentPoint)
+    accumulator += distanceToPrevious
+
+    point =
+      trail: trail
+      distanceFromStart: accumulator
+      distanceFromPrevious: distanceToPrevious,
+      loc:
+        type: "Point"
+        coordinates: currentPoint
+
+    previousPoint = currentPoint
+
+    point
+
 class Gpx
   constructor: (@dom) ->
     throw "An XML document is required" unless @dom?
@@ -43,10 +64,7 @@ class Gpx
     coordinates = for wpt in xpath.select("//trkpt", @dom)
       toGeoJSONPoint(wpt)
 
-    addDistanceFromStart(coordinates)
-
-    for coord in coordinates
-      { trail: id,  loc: {type: "Point", coordinates: coord }}
+    processRawToPointArray(id, coordinates)
 
 module.exports = (dom) ->
   new Gpx(dom)

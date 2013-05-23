@@ -19,17 +19,16 @@ mongo.Db.connect mongoUri, {safe: true}, (err, db) ->
   trailsDone = q.defer()
 
   db.collection 'points', (er, collection) ->
-    collection.remove ->
-      gpx.fromFile("./raw_data/CTR2013.gpx").then (gpx) ->
-        q.ninvoke(collection, "insert", gpx.toPointArray(trails.CT._id))
-          .done -> pointsDone.resolve()
+    collection.remove (err) ->
+      gpx.fromFile("./raw_data/CTR2013.gpx").done (gpx) ->
+        results = gpx.toPointArray(trails.CT._id)
+        q.ninvoke(collection, "insert", results).done( -> pointsDone.resolve())
 
   db.collection 'trails', (er, collection) ->
     collection.remove ->
-      q.ninvoke(collection, "insert", (val for key, val of trails))
-        .done -> trailsDone.resolve()
+      q.ninvoke(collection, "insert", (val for key, val of trails)).done( -> trailsDone.resolve())
 
-  q.all([pointsDone.promise, trailsDone.promise]).finally( -> console.log("done"); db.close() )
+  q.all([pointsDone.promise, trailsDone.promise]).done( -> console.log("done"); db.close() )
 
 
 
