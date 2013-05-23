@@ -7,6 +7,13 @@ trail.load({ path: './raw_data/ct_full.gpx'}).then(function(trail) {
 });
 
 var server = require('restify').createServer()
+server.use(
+	function crossOrigin(req, res, next) {
+		res.header("Access-Control-Allow-Origin", "*");
+		res.header("Access-Control-Allow-Headers", "X-Requested-With");
+		return next();
+	}
+)
 
 server.get('waypoint/:index', waypoint)
 function waypoint(request, response, next) {
