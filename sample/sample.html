@@ -42,6 +42,9 @@
 					totalClimb: totalClimb,
 					totalDescent: totalDescent
 				}
+			},
+			fetchRange: function(from,to) {
+				this.fetch({ data: $.param({ fromKM: from, toKM: to}) })
 			}
 		});
 
