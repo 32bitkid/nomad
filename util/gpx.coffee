@@ -7,6 +7,18 @@ toGeoJSONPoint = (wpt) ->
   ele = parseFloat xpath.select("ele/text()",wpt).toString()
   [lat, lon, ele]
 
+addDistanceFromStart = (coords) ->
+  previousPoint = coords[0]
+
+  accumulator = 0
+
+  for currentPoint, index in coords
+    distanceToPrevious = latlon.distanceBetween(previousPoint, currentPoint)
+    accumulator += distanceToPrevious
+    currentPoint.push(distanceToPrevious)
+    currentPoint.push(accumulator)
+    previousPoint = currentPoint
+
 class Gpx
   constructor: (@dom) ->
     throw "An XML document is required" unless @dom?
@@ -14,6 +26,8 @@ class Gpx
   toLineString: ->
     coordinates = for wpt in xpath.select("//trkpt", @dom)
       toGeoJSONPoint(wpt)
+
+    addDistanceFromStart(coordinates)
 
     {
       type: "LineString"
