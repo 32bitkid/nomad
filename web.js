@@ -15,6 +15,8 @@ server.use(
 		return next();
 	}
 )
+server.use(restify.gzipResponse())
+
 server.get('waypoint/:index', waypoint)
 function waypoint(request, response, next) {
 	response.send(waypoints[request.params.index])
