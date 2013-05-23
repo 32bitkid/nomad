@@ -72,6 +72,8 @@
 			drawPath: function() {
 				this.$("#loading").hide()
 
+				if(this.collection.length == 0) return;
+
 				this.$el.removeClass("icon-spinner icon-4x")
 				var points = this.collection.toJSON();
 				var first = points[0], last = points[points.length - 1]
@@ -105,6 +107,11 @@
 				this.currentPolyline.setMap(this.map)
 			},
 			showLength: function () {
+				if(this.collection.length == 0) {
+					this.$('#totalLength').text("")
+					return;
+				}
+
 				var first = this.collection.first().get("distanceFromStart"),
 					last = this.collection.last().get("distanceFromStart")
 				var text = 'Total length shown: ' + (last - first).toFixed(2) + ' kilometers'
@@ -125,6 +132,8 @@
 
 			},
 			updateStats: function() {
+				if(this.collection.length == 0) return;
+
 				startKM = this.collection.first().get("distanceFromStart")
 				endKM = this.collection.last().get("distanceFromStart")
 
@@ -132,8 +141,8 @@
 				minElevation = _.min(elevations)
 				maxElevation = _.max(elevations)
 
-				this.$("#start h3").text(startKM.toFixed(0))
-				this.$("#end h3").text(endKM.toFixed(0))
+				this.$("#start h3").text(startKM.toFixed(0) +"km")
+				this.$("#end h3").text(endKM.toFixed(0) +"km")
 
 				var width = this.canvas.width;
 				var height = this.canvas.height;
@@ -205,7 +214,7 @@
 	</script>
 	<style>
 		#map-canvas {
-			height: 650px;
+			height: 300px;
 			width: 100%;
 			line-height: 60px;
 		}
