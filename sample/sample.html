@@ -48,6 +48,7 @@
 				this.listenTo(this.collection, "request", this.scrim)
 				this.listenTo(this.collection, "sync", this.showLength)
 				this.listenTo(this.collection, "sync", this.drawPath)
+				this.listenTo(this.collection, "request", this.clearMap)
 
 				var options = {
 					zoom: 4,
@@ -61,6 +62,12 @@
 			},
 			scrim: function() {
 				this.$("#loading").show()
+			},
+			clearMap: function() {
+				if(this.currentPolyline) {
+					this.currentPolyline.setMap(null)
+					this.currentPolyline = undefined
+				}
 			},
 			drawPath: function() {
 				this.$("#loading").hide()
@@ -94,7 +101,8 @@
 				$.each(points, function (index, point) {
 					polyline.path.push(new google.maps.LatLng(point.lat, point.long))
 				})
-				new google.maps.Polyline(polyline).setMap(this.map)
+				this.currentPolyline = new google.maps.Polyline(polyline)
+				this.currentPolyline.setMap(this.map)
 			},
 			showLength: function () {
 				var first = points[0], last = points[points.length - 1]
