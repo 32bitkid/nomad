@@ -14,7 +14,6 @@ function waypoint(request, response, next) {
 }
 
 server.get('trails', getTrails)
-server.get('trails/:trailId', getTrail)
 
 function getTrails(request, response, next) {
 	db('trails', function (collection) {
@@ -26,8 +25,15 @@ function getTrails(request, response, next) {
 	return next()
 }
 
+server.get('trails/:trailId', getTrail)
+
 function getTrail(request, response, next) {
-	response.send("Under Construction!")
+	db('trails', function (collection) {
+		collection.find(new MongoID(request.params.trailId)).toArray(function (err, results) {
+			if (err) console.log(err)
+			else response.send(results)
+		})
+	})
 	return next()
 }
 
@@ -41,6 +47,7 @@ server.listen(port, function() {
 
 
 var mongo = require('mongodb');
+var MongoID = mongo.ObjectID
 
 var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
