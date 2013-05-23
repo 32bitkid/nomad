@@ -54,6 +54,7 @@ function augmentTrail(trail, base) {
 
 server.get("points/:trailId", getTrailPoints)
 function getTrailPoints(request, response, next) {
+	var base = baseUrl(request)
 	var trailId = new MongoID(request.params.trailId)
 	db('points', function (collection) {
 		collection
@@ -61,11 +62,23 @@ function getTrailPoints(request, response, next) {
 			.sort('distanceFromStart')
 			.toArray(function (err, results) {
 				if (err) console.log(err)
-				else response.send(results)
+				else response.send(_.map(results, function (point) { return convertPoint(point, base) }))
 			})
 	})
 	return next()
 }
+
+function convertPoint(point, base) {
+	return {
+		distanceFromStart: point.distancefromStart,
+		distanceFromPrevious: point.distanceFromPrevious,
+		lat: point.loc.coordinates[0],
+		long: point.loc.coordinates[1],
+		elevation: point.loc.coordinates[3],
+		trail: { href: base + '/trails/' + point.trail }
+	}
+}
+
 
 
 function baseUrl(request) {
