@@ -2,7 +2,7 @@
 	"name": "nomad-api",
 	"version": "0.0.1",
 	"scripts": {
-		"test": "mocha --compilers coffee:coffee-script",
+		"test": "mocha --compilers coffee:coffee-script -t 60000",
 		"start": "node web.js"
 	},
 	"dependencies": {
