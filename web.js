@@ -10,7 +10,7 @@ var server = require('restify').createServer()
 server.use(
 	function crossOrigin(req, res, next) {
 		res.header("Access-Control-Allow-Origin", "*");
-		res.header("Access-Control-Allow-Headers", "X-Requested-With");
+		res.header("Access-Control-Allow-Headers", req.header("Access-Control-Allow-Headers"));
 		return next();
 	}
 )
@@ -22,7 +22,6 @@ function waypoint(request, response, next) {
 }
 
 server.get('trails', getTrails)
-
 function getTrails(request, response, next) {
 	var base = baseUrl(request)
 	db('trails', function (collection) {
@@ -35,14 +34,13 @@ function getTrails(request, response, next) {
 }
 
 server.get('trails/:trailId', getTrail)
-
 function getTrail(request, response, next) {
 	var base = baseUrl(request)
 	var key = new MongoID(request.params.trailId)
 	db('trails', function (collection) {
-		collection.find(key).toArray(function (err, result) {
+		collection.find(key).toArray(function (err, results) {
 			if (err) console.log(err)
-			else response.send(augmentTrail(result[0], base))
+			else response.send(augmentTrail(results[0], base))
 		})
 	})
 	return next()
@@ -74,7 +72,7 @@ var MongoID = mongo.ObjectID
 
 var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
-  'mongodb://heroku_app15820215:em58r9ed9ha8r2hngghf4vnqeu@ds027348.mongolab.com:27348/heroku_app15820215';
+	'mongodb://heroku_app15820215:em58r9ed9ha8r2hngghf4vnqeu@ds027348.mongolab.com:27348/heroku_app15820215'
 
 function db(collection, callback) {
 	mongo.Db.connect(mongoUri, function (err, db) {
