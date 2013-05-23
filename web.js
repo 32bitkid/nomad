@@ -24,7 +24,12 @@ server.get('trails', getTrails)
 server.get('trails/:trailId', getTrail)
 
 function getTrails(request, response, next) {
-	response.send("Under Construction!")
+	db('trails', function (collection) {
+		collection.find().toArray(function(err, results) {
+			if (err) console.log(err)
+			else response.send(results)
+		})
+	})
 	return next()
 }
 
@@ -42,12 +47,21 @@ server.listen(port, function() {
 })
 
 
-
 var mongo = require('mongodb');
 
 var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
   'mongodb://heroku_app15820215:em58r9ed9ha8r2hngghf4vnqeu@ds027348.mongolab.com:27348/heroku_app15820215';
+
+function db(collection, callback) {
+	mongo.Db.connect(mongoUri, function (err, db) {
+		if (err) console.log(err)
+		else db.collection(collection, function (err, collection) {
+			if (err) console.log(err)
+			else callback(collection)
+		})
+	})
+}
 
 
 /*
