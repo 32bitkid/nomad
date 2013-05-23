@@ -8,6 +8,7 @@ trail.load({ path: './raw_data/ct_full.gpx'}).then(function(trail) {
 
 var restify = require('restify')
 var server = restify.createServer()
+server.use(restify.queryParser());
 server.use(
 	function crossOrigin(req, res, next) {
 		res.header("Access-Control-Allow-Origin", "*");
@@ -59,13 +60,26 @@ function getTrailPoints(request, response, next) {
 	var base = baseUrl(request)
 	var trailId = new MongoID(request.params.trailId)
 	db('points', function (collection) {
-		collection
-			.find({ trail: trailId, distanceFromPrevious:{$gte: 0.1} }, { exhaust: true })
+		var query = { trail: trailId };
+
+		var range = []
+		if(request.params.fromKM)
+			range.push({"distanceFromStart": {$gte: parseFloat(request.params.fromKM)}})
+		if(request.params.toKM)
+			range.push({"distanceFromStart": {$lte: parseFloat(request.params.toKM)}})
+
+		if(range.length > 0)
+			query["$and"] = range
+		else
+			query.distanceFromPrevious = {$gte: 0.1}
+
+		collection.find(query, { exhaust: true })
+
 			.sort('distanceFromStart')
 			.toArray(function (err, results) {
 				if (err) console.log(err)
 				else response.send(_.map(results, function (point) { return convertPoint(point, base) }))
-			})
+			});
 	})
 	return next()
 }
