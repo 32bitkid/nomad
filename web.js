@@ -48,11 +48,11 @@ function getTrail(request, response, next) {
 
 function augmentTrail(trail, base) {
 	trail.href = base + '/trails/' + trail._id
-	trail.points = { href: base + '/points/' + trail._id }
+	trail.points = { href: trail.href + '/points' }
 	return trail
 }
 
-server.get("points/:trailId", getTrailPoints)
+server.get("trails/:trailId/points", getTrailPoints)
 function getTrailPoints(request, response, next) {
 	var base = baseUrl(request)
 	var trailId = new MongoID(request.params.trailId)
