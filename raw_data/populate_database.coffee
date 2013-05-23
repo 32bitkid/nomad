@@ -6,7 +6,7 @@ trail = require('../util/trail')
 ct_options =
   _id: "CT"
   name: 'Colorado Trail'
-  description: 'Colorado’s premier long distance trail, stretching almost 500 miles from Denver to Durango.'
+  description: 'Colorado\'s premier long distance trail, stretching almost 500 miles from Denver to Durango.'
   homepage: 'http://www.coloradotrail.org/'
   path: './raw_data/CTR2013.gpx'
 
