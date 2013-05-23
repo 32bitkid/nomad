@@ -18,6 +18,7 @@ trails =
 points = []
 
 mongoUri = 'mongodb://localhost:27017/nomad';
+#mongoUri = 'mongodb://heroku_app15820215:em58r9ed9ha8r2hngghf4vnqeu@ds027348.mongolab.com:27348/heroku_app15820215'
 
 mongo.Db.connect mongoUri, {safe: true}, (err, db) ->
   console.log(err) if (err)
@@ -27,7 +28,7 @@ mongo.Db.connect mongoUri, {safe: true}, (err, db) ->
 
   db.collection 'points', (er, collection) ->
     collection.remove (err) ->
-      gpx.fromFile("./raw_data/CTR2013.gpx").done (gpx) ->
+      gpx.fromFile(trails.CT.rawData).done (gpx) ->
         results = gpx.toPointArray(trails.CT._id)
         collection.insert(results, {safe: true}, (e) -> return pointsDone.reject(e) if e?; pointsDone.resolve())
 
