@@ -9,7 +9,10 @@ readFile = q.nfbind(fs.readFile)
 class Trail
   constructor: (options, @path) ->
     @name = options.name
-    @id = options.id
+    @_id = options.id
+    @description = options.description
+    @homepage = options.homepage
+
 
 defaultLoadOptions = {}
 

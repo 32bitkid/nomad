@@ -18,7 +18,9 @@
     function Trail(options, path) {
       this.path = path;
       this.name = options.name;
-      this.id = options.id;
+      this._id = options.id;
+      this.description = options.description;
+      this.homepage = options.homepage;
     }
 
     return Trail;
