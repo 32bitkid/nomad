@@ -60,7 +60,7 @@ function baseUrl(request) {
 
 
 
-//server.get('/:file', restify.serveStatic({ directory: '', match: /.*\.html/ }))
+server.get('/\/.*/', restify.serveStatic({ directory: './sample', default: 'sample.html' }))
 
 
 var port = process.env.PORT || 5000;
