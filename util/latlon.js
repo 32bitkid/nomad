@@ -17,10 +17,10 @@
       if (R == null) {
         R = EARTH_RADIUS;
       }
-      lat1 = toRad(start.lat);
-      lon1 = toRad(start.lon);
-      lat2 = toRad(end.lat);
-      lon2 = toRad(end.lon);
+      lat1 = toRad(start.lat || start[0]);
+      lon1 = toRad(start.lon || start[1]);
+      lat2 = toRad(end.lat || end[0]);
+      lon2 = toRad(end.lon || end[1]);
       dLat = lat2 - lat1;
       dLon = lon2 - lon1;
       a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
