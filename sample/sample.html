@@ -50,6 +50,7 @@
 
 		Trails = Backbone.Collection.extend({
 			url: "trails",
+			model: Backbone.Model.extend({idAttribute:"_id"}),
 			createPointsCollection: function() {
 				return Points.extend({
 					url: this.get("points").href
@@ -76,6 +77,29 @@
 				return this;
 			}
 		});
+
+		SelectorOptionView = Backbone.View.extend({
+			tagName: "option",
+			render: function() {
+				this.$el.text(this.model.get("name"))
+				this.el.value = this.model.id
+				return this;
+			}
+		})
+
+		SelectorView = Backbone.View.extend({
+			events: { "change": "onChange" },
+			initialize: function() {
+				this.listenTo(this.collection, "add", this.addOption)
+			},
+			addOption: function(trail) {
+				this.el.appendChild(new SelectorOptionView({model:trail}).render().el)
+			},
+			onChange: function() {
+				var selectedTrail = this.collection.get(this.$el.val())
+				if(selectedTrail) selectedTrail.trigger("activate", selectedTrail)
+			}
+		})
 
 		MapView = Backbone.View.extend({
 			initialize: function() {
@@ -250,12 +274,17 @@
 			var descriptionView = new DescriptionView({collection: trails, el:document.getElementById("description")}).render()
 			var mapView = new MapView({collection:points, el:document.getElementById("map")}).render()
 			var vizView = new VisualizationView({collection:points, el:document.getElementById("visualization")}).render()
+			var selectorView = new SelectorView({collection: trails, el:document.getElementById("trail-selector")})
+
+
+			trails.on("activate", function(t) {
+				points.url = t.get("points").href
+				points.fetch()
+			})
 
 			trails.fetch().done(function() {
 				var firstTrail = trails.first()
 				firstTrail = firstTrail.trigger("activate", firstTrail)
-				points.url = firstTrail.get("points").href
-				points.fetch()
 			})
 		})
 	</script>
@@ -293,9 +322,14 @@
 			padding: 0 5em;
 		}
 
+		#trail-selector {
+			float: right;
+		}
+
 	</style>
 </head>
 <body>
+	<select id="trail-selector"></select>
 	<h1 id="name"></h1>
 	<div id="description"></div>
 	<div id="visualization">
