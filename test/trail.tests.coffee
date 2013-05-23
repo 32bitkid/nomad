@@ -10,9 +10,10 @@ describe "Loading a trail", ->
   it "should load from a path to xml", (done) ->
 
     expected = (trail) ->
-      expect(trail.path.coordinates.length).to.equal(1379)
+      expect(trail.path.coordinates.length).to.equal(10000)
       done()
 
-    promise = Trail.load(path: "./raw_data/ct_full.gpx")
+    promise = Trail.load(path: "./raw_data/CTR2013.gpx")
+    #promise = Trail.load(path: "./raw_data/at_centerline_full.gpx")
     promise.then(expected).fail(done)
 

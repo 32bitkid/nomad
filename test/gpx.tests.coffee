@@ -12,60 +12,6 @@ describe "The GPX helper", ->
 
   describe "converting to a LineString", ->
 
-    describe "with only 3 way points", ->
-
-      xml = """
-            <?xml version="1.0"?>
-            <gpx creator="GPS Visualizer http://www.gpsvisualizer.com/" version="1.0" xmlns="http://www.topografix.com/GPX/1/0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
-            <wpt lat="39.075217" lon="-106.332433">
-              <ele>2809.3</ele>
-              <time>2013-02-07T21:34:11Z</time>
-              <name>01_000XX</name>
-              <desc>Routes Split</desc>
-            </wpt>
-            <wpt lat="39.077567" lon="-106.34085">
-              <ele>2808.8</ele>
-              <time>2013-02-07T21:34:11Z</time>
-              <name>01_005WT</name>
-              <desc>Stream</desc>
-            </wpt>
-            <wpt lat="39.077167" lon="-106.343467">
-              <ele>2809.6</ele>
-              <time>2013-02-07T21:34:11Z</time>
-              <name>01_007XX</name>
-              <desc>InterLaken trail</desc>
-            </wpt>
-            </gpx>
-            """
-
-      beforeEach ->
-        gpxData = new dom().parseFromString(xml)
-        @lineString = gpx(gpxData).toLineString()
-
-      afterEach ->
-        delete @lineString
-
-      it "it should be a LineString", ->
-        expect(@lineString.type).to.equal("LineString")
-
-      it "get the correct length", ->
-        expect(@lineString.coordinates.length).to.equal(3)
-
-      it "should have the correct longitude", ->
-        actual = _(@lineString.coordinates).pluck(1)
-        expected = [-106.332433, -106.34085, -106.343467]
-        expect(actual).to.deep.equal(expected)
-
-      it "should parse the correct latitude", ->
-        actual = _(@lineString.coordinates).pluck(0)
-        expected = [39.075217, 39.077567, 39.077167]
-        expect(actual).to.deep.equal(expected)
-
-      it "should parse the correct elevation", ->
-        actual = _(@lineString.coordinates).pluck(2)
-        expected = [2809.3, 2808.8, 2809.6]
-        expect(actual).to.deep.equal(expected)
-
     describe "with only 3 track points", ->
 
       xml = """

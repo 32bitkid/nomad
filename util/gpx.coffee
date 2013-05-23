@@ -12,7 +12,7 @@ class Gpx
     throw "An XML document is required" unless @dom?
 
   toLineString: ->
-    coordinates = for wpt in xpath.select("//wpt|//trkpt", @dom)
+    coordinates = for wpt in xpath.select("//trkpt", @dom)
       toGeoJSONPoint(wpt)
 
     {
