@@ -1,3 +1,4 @@
+var _ = require('underscore')
 var trail = require('./util/trail')
 
 var waypoints = []
@@ -19,7 +20,7 @@ function getTrails(request, response, next) {
 	db('trails', function (collection) {
 		collection.find().toArray(function(err, results) {
 			if (err) console.log(err)
-			else response.send(results)
+			else response.send(_.map(results, augmentTrail))
 		})
 	})
 	return next()
@@ -28,13 +29,19 @@ function getTrails(request, response, next) {
 server.get('trails/:trailId', getTrail)
 
 function getTrail(request, response, next) {
+	var key = new MongoID(request.params.trailId)
 	db('trails', function (collection) {
-		collection.find(new MongoID(request.params.trailId)).toArray(function (err, results) {
+		collection.find(key).toArray(function (err, result) {
 			if (err) console.log(err)
-			else response.send(results)
+			else response.send(augmentTrail(result[0]))
 		})
 	})
 	return next()
+}
+
+function augmentTrail(trail) {
+	trail.href = '/trails/' + trail._id
+	return trail
 }
 
 
