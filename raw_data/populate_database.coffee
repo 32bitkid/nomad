@@ -8,6 +8,12 @@ trails =
     description: 'Colorado\'s premier long distance trail, stretching almost 500 miles from Denver to Durango.'
     homepage: 'http://www.coloradotrail.org/'
     rawData: "./raw_data/CTR2013.gpx"
+  AT:
+    _id: mongo.ObjectID()
+    name: 'Appalachian Trail'
+    description: '2,200 miles (3,500 km) through Georgia, North Carolina, Tennessee, Virginia, West Virginia, Maryland, Pennsylvania, New Jersey, New York, Connecticut, Massachusetts, Vermont, New Hampshire, and Maine.'
+    homepage: 'http://www.nps.gov/appa'
+    rawData: "./raw_data/at_centerline_full.gpx"
 
 points = []
 
